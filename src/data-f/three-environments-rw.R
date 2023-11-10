@@ -2,8 +2,8 @@
 # Read and write function for the three environments data
 ################################################################################
 
-three_env_rw <- function (data_path, conditions = "all", participants_keep, 
-                          files_suffix) {
+three_env_rw <- function (data_path, domains_keep = "all", participants_keep, 
+                          file_suffix) {
   # read matlab data from `data_path` argument
   tmp <- R.matlab::readMat(con = data_path)
   
@@ -66,14 +66,14 @@ three_env_rw <- function (data_path, conditions = "all", participants_keep,
                            values = tmp$d[[7]][i, 1:n_trials_part])
     
     # read category variable by trial
-    category_id <- tmp$d[[12]][i, 1:n_trials_part]
+    condition_id <- tmp$d[[12]][i, 1:n_trials_part]
     
     # update category as numeric variable
-    category <- append(x = category, values = category_id)
+    condition <- append(x = condition, values = condition_id)
     
     # update name of category
-    category_char <- append(x = category_char, 
-                            values = category_names[category_id])
+    condition_char <- append(x = condition_char, 
+                            values = category_names[condition_id])
     
     # update trial by condition
     trial_condition <- append(
@@ -84,7 +84,7 @@ three_env_rw <- function (data_path, conditions = "all", participants_keep,
         FUN = seq, from = 1)))
     
     # read stimulus variable by trial
-    stimulus_id <- three_env$d[[9]][i, 1:n_trials_part]
+    stimulus_id <- tmp$d[[9]][i, 1:n_trials_part]
     
     # update stimulus as a numeric variable
     stimulus <- append(x = stimulus, values = stimulus_id)
@@ -94,7 +94,7 @@ three_env_rw <- function (data_path, conditions = "all", participants_keep,
                             values = stimulus_names[stimulus_id])
     
     # read response variable by trial
-    response_id <- tmp$d[[10]][i, 1:n_trials]
+    response_id <- tmp$d[[10]][i, 1:n_trials_part]
     
     # update response as numeric value
     response <- append(x = response, values = response_id - 1)
@@ -104,33 +104,69 @@ three_env_rw <- function (data_path, conditions = "all", participants_keep,
                             values = 
                               response_names[response_id + 2 * domain_id - 2])
     
+    # update true category indicator
+    category_id <- tmp$d[[21]][i, 1:n_trials_part]
     
+    # update true category as numeric value
+    category <- append(x = category, values = category_id - 1)
+    
+    # update true category of stimulus
+    category_char <- append(x = category_char, 
+                         values = response_names[category_id + 2 * domain_id - 2])
+    
+    # update correct response variable
+    correct <- append(x = correct, values = tmp$d[[11]][i, 1:n_trials_part])
+    
+    # update change point indicator
+    change_point <- append(x = change_point, 
+                           values = dplyr::lag(condition_id) != condition_id & 
+                             tmp$d[[7]][i, 1:n_trials_part] != 1)
     
   }
-
+  
+  # remove change point from first trial of a domain
+  change_point <- ifelse(test = is.na(change_point), 
+                         yes = FALSE, no = change_point)
+  
+  # create output variable as a data frame
+  output <- data.frame("id" = id,
+                       "trial" = trial,
+                       "domain" = domain,
+                       "domain_char" = domain_char,
+                       "trial_domain" = trial_domain, 
+                       "condition" = condition,
+                       "condition_char" = condition_char,
+                       "trial_condition" = trial_condition,
+                       "stimulus" = stimulus,
+                       "stimulus_char" = stimulus_char,
+                       "response" = response,
+                       "response_char" = response_char,
+                       "category" = category,
+                       "category_char" = category_char,
+                       "correct" = correct,
+                       "change_point" = change_point)
+  
+  # filter out domains if required
+  if (domains_keep != "all") {
+    output <- subset(x = output, subset = output$domain_char %in% domains_keep)
+    
+    # filter out participants if required
+    if (!missing(x = participants_keep)) {
+      output <- subset(x = output, subset = output$id %in% participants_keep)
+      file_suffix <- paste(c(domains_keep, "-filtered"), collapse = "")
+    }
+    else {
+      file_suffix <- paste(c(domains_keep), collapse = "")
+    }
+  }
+  
+  if (missing(file_suffix)) {
+    file_suffix <- "all"  
+  }
+  
+  # write output variable as a csv file in long format.
+  readr::write_csv(x = output, 
+                   file = paste(c("data/csv-files/three-environments-", 
+                                  file_suffix, ".csv"), collapse = ""))
+  
 }
-
-for(i in 1:n){
-  t_id <- three_env$d[[21]][i, 1:n_trials]
-  truth_id <- append(x = truth_id, values = t_id - 1)
-  truth <- append(x = truth, values = r_names[t_id + 2 * d_id - 2])
-  correct <- append(x = correct, values = three_env$d[[11]][i, 1:n_trials])
-  block <- append(x = block, values = three_env$d[[13]][i, 1:n_trials])
-  change_point <- append(x = change_point, 
-                         values = lag(c_id) != c_id & three_env$d[[7]][i, 1:n_trials] != 1)
-}
-
-change_point <- ifelse(test = is.na(change_point), yes = FALSE, 
-                       no = change_point)
-
-three_env <- data.frame("id" = id, "trial" = trial, "trial_domain" = trial_domain, 
-                        "domain_id" = domain_id, "domain" = domain,
-                        "category_id" = category_id, "category" = category,
-                        "stimulus_id" = stimulus_id, "stimulus" = stimulus, 
-                        "response_id" = response_id, "response" = response, 
-                        "truth_id" = truth_id, "truth" = truth, 
-                        "correct" = correct, "block" = block,
-                        "change_point" = change_point,
-                        "condition" = rep(1, length(id)))
-
-write_csv(three_env, file = "data/three-environments/three-environments.csv")

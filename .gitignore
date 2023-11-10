@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Ignore large posterior samples files
+data/posterior-samples/model-parameters/three-environments-posterior-samples.rds

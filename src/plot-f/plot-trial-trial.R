@@ -1,6 +1,7 @@
 # Plotting function for trial by trial responses single participant
 
-trial_trial_participant <- function (data, posteriors, participant_id,
+trial_trial_participant <- function (data, posteriors, participant_id, 
+                                     conditions,
                                      posterior_add = FALSE, transfer = FALSE,
                                      stimulus_plot, plot_order,
                                      category_color, border_color,
@@ -12,15 +13,9 @@ trial_trial_participant <- function (data, posteriors, participant_id,
                                      posterior_margin = 0.08, lwd_rect = 0.1,
                                      bar_width = 0.1, 
                                      transparency_bars = TRUE, 
-                                     x_lim) {
+                                     x_lim, change_points) {
   
   n_trials <- data$participant_t[participant_id]
-  
-  if(missing(x_lim)){
-    x_lim = c(0, n_trials + 1)
-  }
-  
-  rect_color <- c("#2e3036", "white")
   
   if (missing(plot_order)){
     plot_order <- 1:dim(data$response)[1]
@@ -33,6 +28,12 @@ trial_trial_participant <- function (data, posteriors, participant_id,
   else {
     responses <- data$response[stimulus_plot, 1:n_trials, participant_id]
   }
+  
+  if(missing(x_lim)){
+    x_lim = c(0, n_trials + 1)
+  }
+  
+  rect_color <- c("#2e3036", "white")
   
   n_stimulus <- dim(responses)[1]
   
@@ -60,6 +61,10 @@ trial_trial_participant <- function (data, posteriors, participant_id,
   plot(x = 0, y = 0, type = "n", ann = FALSE, axes = FALSE, 
        xlim = x_lim, ylim = c(0,n_stimulus + height))
   
+  if (!missing(change_points)) {
+    abline(v = change_points - 0.5, lty = 1)
+  }
+  
   if (shade_stimulus == TRUE) {
     for (i in 1:n_stimulus) {
         rect(xleft = - (width / 2 + region[2]), 
@@ -77,9 +82,12 @@ trial_trial_participant <- function (data, posteriors, participant_id,
            xright = tt + width / 2, 
            ytop = which(!is.na(responses[, tt])) + height / 2,
            border = 
-             border_color[responses[which(!is.na(responses[, tt])), tt] + 1],
+             border_color[conditions[tt],
+                          responses[which(!is.na(responses[, tt])), tt] + 1],
            col = 
-             category_color[responses[which(!is.na(responses[, tt])), tt] + 1],
+             category_color[
+               conditions[tt],
+               responses[which(!is.na(responses[, tt])), tt] + 1],
            lwd = lwd_rect)
       
     }  
@@ -101,8 +109,9 @@ trial_trial_participant <- function (data, posteriors, participant_id,
           ytop = ifelse(test = states_mean[, tt] > 0.5, 
                         yes = a + states_mean[, tt] * (b - a), 
                         no = mid),
-          col = category_color[round(states_mean[, tt]) + 1],
-          border = category_color[round(states_mean[, tt]) + 1], lwd = 1.3)
+          col = category_color[conditions[tt], round(states_mean[, tt]) + 1],
+          border = category_color[conditions[tt], round(states_mean[, tt]) + 1], 
+          lwd = 1.3)
       
     }
     # abline(h = mid, col = "#FCF6F5FF", lwd = 1.83)

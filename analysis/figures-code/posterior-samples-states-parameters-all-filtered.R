@@ -1,6 +1,13 @@
+################################################################################
+# Plot trial by trial choices, mean posterior state and posterior parameter 
+# samples of all participants in the disease domain
+################################################################################
 
-# load ploting function
+# load plotting function
 source(file = "src/plot-f/plot-trial-trial.R")
+
+# load data transformation function
+source(file = "src/sampling-f/transform-data-chmm.R")
 
 # load data transformed into the chmm format with features
 three_env <- transform_data_chmm(
@@ -15,6 +22,9 @@ tmp <- readr::read_csv(
 samples <- readRDS(file = paste(c("data/posterior-samples/model-parameters/",
                                   "three-environments-posterior-samples.rds"),
                                 collapse = ""))
+
+# color by category
+color_cat <- c("#64c5eb", "#7f58af", "#e84d8a", "#feb326")
 
 # start figure pdf file
 grDevices::cairo_pdf(
@@ -41,30 +51,39 @@ for (pp in 1:length(part)) {
       xaxs = "i")
   
 # find change points of participant pp
-  change_points <- which(
-    x = subset(x = tmp, subset = id == part[pp])$change_point == TRUE)
+  cp <- which(x = subset(x = tmp, subset = id == part[pp])$change_point == TRUE)
+  
+# transform condition into numeric ordered variable
+  condition_ordered <- sort(unique(tmp$condition_char[which(tmp$id == part[pp])]))
+  
+  cc <- ifelse(test = tmp$condition_char[which(tmp$id == part[pp])] %in%
+                 condition_ordered[1], yes = 1, 
+               no = ifelse(test = tmp$condition_char[which(tmp$id == part[pp])] %in%
+                             condition_ordered[2], yes = 2, 
+                           no = ifelse(
+                             test = tmp$condition_char[which(tmp$id == part[pp])] %in%
+                               condition_ordered[3], yes = 3, no = 4)))
 
 # plot trial by trial responses and posterior mean in a single graph
   trial_trial_participant(data = three_env, 
+                          conditions = cc,
                           posterior_add = TRUE, 
                           posteriors = samples,
                           participant_id = pp, 
                           width = 0.75, 
                           height = 0.33,
-                          category_color = c("#30626d", "#723f75"),
-                          border_color = c("#30626d", "#723f75"), 
+                          category_color = 
+                            cbind(rep(x = "#36454f", 4), color_cat),
+                          border_color = 
+                            cbind(rep(x = "#36454f", 4), color_cat),
                           shade_stimulus = TRUE,
                           bar_width = 0.27,
                           transparency_bars = FALSE, 
-                          lwd_rect = 1.5)
+                          lwd_rect = 1.5, change_points = cp)
   
   # add participant id as title for each plot
-  mtext(text = paste("Participant: ", pp), 
+  mtext(text = paste("Participant: ", part[pp]), 
         side = 3, outer = TRUE, cex = 2, line = -0.2, at = 0.5)
-    
-  
-  # add vertical lines to the plot to highlight change points
-  abline(v = change_points)
   
   # add L shaped limits to the plotting region
   box(bty = "l")
@@ -75,7 +94,7 @@ for (pp in 1:length(part)) {
                  three_env$participant_t[pp]))
   
   # add stimulus names in the y axis of the plot
-  axis(2, at = seq(1, nrow(three_env$response)), 
+  axis(2, at = seq(1, nrow(three_env$response)) - 0.5, 
        labels = three_env$stimulus_features$animal_names, las = 2, 
        cex.axis = 1.5)
   

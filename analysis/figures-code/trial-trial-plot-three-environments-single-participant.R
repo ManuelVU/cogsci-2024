@@ -85,7 +85,7 @@ axis(1, at = c(1, seq(30,three_env$participant_t[pp], 30),
                three_env$participant_t[pp]), padj = -0.9, cex = 1.3)
 
 # add stimulus names in the y axis of the plot
-axis(side = 2, at = seq(1, nrow(three_env$response)), 
+axis(side = 2, at = seq(1, nrow(three_env$response)) - 0.5, 
      labels = three_env$stimulus_features$animal_names, 
      las = 2)
 

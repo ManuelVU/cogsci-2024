@@ -153,10 +153,10 @@ three_env_rw <- function (data_path, domains_keep = "all", participants_keep,
     # filter out participants if required
     if (!missing(x = participants_keep)) {
       output <- subset(x = output, subset = output$id %in% participants_keep)
-      file_suffix <- paste(c(domains_keep, "-filtered"), collapse = "")
+      file_suffix <- paste(c(domains_keep, "-filtered",file_suffix), collapse = "")
     }
     else {
-      file_suffix <- paste(c(domains_keep), collapse = "")
+      file_suffix <- paste(c(domains_keep, file_suffix), collapse = "")
     }
   }
   

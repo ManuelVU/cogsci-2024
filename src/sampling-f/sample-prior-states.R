@@ -3,9 +3,10 @@
 
 initial_states <- function(n_chains, n_trials, n_participants,
                            similarity, initial_state_probability,
-                           inertia_category_a, inertia_category_b) {
+                           inertia_category_a, inertia_category_b,
+                           total_trials) {
 
-  output <- array(data = NA, dim = c(n_chains, max(n_trials), n_participants))
+  output <- array(data = NA, dim = c(n_chains, total_trials, n_participants))
   
   diag(similarity) <- 0
   
@@ -37,13 +38,3 @@ initial_states <- function(n_chains, n_trials, n_participants,
   }
   return(output)
 }
-
-# test
-# b <- distinctive_ln(stimulus_features = this$stimulus_features)
-# d <- featural_distance(distinctive_features = b)
-# sm <- similarity_ij(decay_rate = 1, decay_function = 1, dissimilarity = d)
-# 
-# initial_states(n_chains = 9, n_trials = rep(200,19), n_participants = 19,
-#                similarity = sm, initial_state_probability = 0.5,
-#                inertia_category_a = rgamma(n = 19,shape = 2, rate = 1),
-#                inertia_category_b = rgamma(n = 19,shape = 2, rate = 1))

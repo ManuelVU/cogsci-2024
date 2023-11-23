@@ -2,9 +2,6 @@
 # Sampling by trial blocks before and after change points
 ################################################################################
 # Load functions into R environment
-rm(list = ls())
-gc()
-
 source(file = "analysis/load-functions.R")
 
 # wirte csv file with only two participants (best and worst)
@@ -29,11 +26,10 @@ cp_2 <- unique(subset(x = tmp,
 disease <- list()
 
 # change-point 1 ----
-
 disease$response <- array(data = NA, 
                           dim = c(dim(three_environments$response)[1],
-                                dim(three_environments$response)[2],
-                                dim(three_environments$response)[3]))
+                                  dim(three_environments$response)[2],
+                                  dim(three_environments$response)[3]))
 
 disease$response[,1:(cp_1[1] - 1), 1] <- 
   three_environments$response[, 1:(cp_1[1] - 1), 1]
@@ -70,8 +66,8 @@ prior_values <- list("gamma" = c(1, 1),
 initial_values <- list("gamma" = rep(x = 0.5, 
                                      times = dim(disease$response)[3]),
                        "epsilon" = rbeta(n = dim(disease$response)[3],
-                                         shape1 = 10,
-                                         shape2 = 100),
+                                         shape1 = 2,
+                                         shape2 = 102),
                        "alpha" = rep(x = 5, 
                                      times = dim(disease$response)[3]),
                        "beta" = rep(x = 5, 
@@ -102,7 +98,7 @@ disease$response <- array(data = NA,
                                   dim(three_environments$response)[2],
                                   dim(three_environments$response)[3]))
 
-disease$response[,1:(cp_1[2] - 1), 1] <- 
+disease$response[, 1:(cp_1[2] - 1), 1] <- 
   three_environments$response[, 1:(cp_1[2] - 1), 1]
 
 disease$response[, 1:(cp_2[2] - 1), 2] <- 
@@ -137,15 +133,15 @@ prior_values <- list("gamma" = c(1, 1),
 initial_values <- list("gamma" = rep(x = 0.5, 
                                      times = dim(disease$response)[3]),
                        "epsilon" = rbeta(n = dim(disease$response)[3],
-                                         shape1 = 10,
-                                         shape2 = 100),
+                                         shape1 = 2,
+                                         shape2 = 102),
                        "alpha" = rep(x = 5, 
                                      times = dim(disease$response)[3]),
                        "beta" = rep(x = 5, 
                                     times = dim(disease$response)[3]))
 
 # set step size for the adaptation method of the HMC algorithm
-step_size_starting <- rep(0.1, dim(disease$response)[3])
+step_size_starting <- rep(x = 0.1, times = dim(disease$response)[3])
 
 # Start sampling using chmm_sampler
 samples <- chmm_sampling(data_chmm = disease,
@@ -204,8 +200,8 @@ prior_values <- list("gamma" = c(1, 1),
 initial_values <- list("gamma" = rep(x = 0.5, 
                                      times = dim(disease$response)[3]),
                        "epsilon" = rbeta(n = dim(disease$response)[3],
-                                         shape1 = 10,
-                                         shape2 = 100),
+                                         shape1 = 2,
+                                         shape2 = 102),
                        "alpha" = rep(x = 5, 
                                      times = dim(disease$response)[3]),
                        "beta" = rep(x = 5, 

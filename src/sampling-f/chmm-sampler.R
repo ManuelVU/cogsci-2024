@@ -67,7 +67,8 @@ chmm_sampling <- function(data_chmm, metric = "distinctive", order_p = 1,
     similarity = stimulus_similarity,
     initial_state_probability = sample_gamma[1,],
     inertia_category_a = sample_alpha[1,],
-    inertia_category_b = sample_beta[1,])
+    inertia_category_b = sample_beta[1,], 
+    total_trials = dim(responses)[2])
   
   # Start states array to store samples of states
   sample_states <- array(data = NA, dim = c(dim(responses), n_iterations))

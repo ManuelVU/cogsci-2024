@@ -12,8 +12,17 @@ three_env_rw(data_path = "data/matlab-files/three-environments.mat")
 three_env_rw(data_path = "data/matlab-files/three-environments.mat", 
              domains_keep = "Disease")
 
+# write data for analysis with only those participants who saw at least one 
+# change
+source(file = "analysis/data-cleaning/filter-participants-disease-4conditions.R")
+three_env_rw(data_path = "data/matlab-files/three-environments.mat", 
+             domains_keep = "Disease", participants_keep = participants_2_more, 
+             file_suffix = "-2-more-categories")
+
 # write data from disease domain into a csv keeping only participants that 
 # experienced all 4 category structures and meet the learning criterion
 source(file = "analysis/data-cleaning/filter-participants-disease-4conditions.R")
 three_env_rw(data_path = "data/matlab-files/three-environments.mat", 
              domains_keep = "Disease", participants_keep = participants_4c)
+
+

@@ -26,3 +26,6 @@ for (n in participants) {
 # create a vector to pass to data function with the id's of participants who
 # experienced all four conditions of the disease domain
 participants_4c <- which(conditions == 4)
+
+# create a vector with the id's of participants who saw at teast 2 categories
+participants_2_more <- which(conditions > 1)

@@ -2,7 +2,8 @@
 # the responses as a 3 dimensional array (stimulus, trial, participant) the 
 # number of trials per participant in the study and the stimulus .
 
-transform_data_chmm <- function(directory_data, directory_features) {
+transform_data_chmm <- function(directory_data, directory_features, 
+                                simmilarity = FALSE) {
   
   a <- readr::read_csv(file = directory_data)
   
@@ -48,6 +49,17 @@ transform_data_chmm <- function(directory_data, directory_features) {
   output <- list("response" = response_output[,,1:count],
                  "participant_t" = trial_participant,
                  "stimulus_features" = f)
+  
+  if (simmilarity == TRUE) {
+    
+    f <- as.matrix(f[, -1])
+    
+    diag(f) <- 1
+    
+    output <- list("response" = response_output[,,1:count],
+                   "participant_t" = trial_participant,
+                   "simmilarity" = f)
+  }
   
   return(output)
 }

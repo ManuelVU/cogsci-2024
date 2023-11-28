@@ -101,8 +101,9 @@ three_env_rw <- function (data_path, domains_keep = "all", participants_keep,
     
     # update name of response
     response_char <- append(x = response_char, 
-                            values = 
-                              response_names[response_id + 2 * domain_id - 2])
+                            values = ifelse(test = response_id == 2,
+                                            yes = "healthy", 
+                                            no = "infected"))
     
     # update true category indicator
     category_id <- tmp$d[[21]][i, 1:n_trials_part]
@@ -112,7 +113,9 @@ three_env_rw <- function (data_path, domains_keep = "all", participants_keep,
     
     # update true category of stimulus
     category_char <- append(x = category_char, 
-                         values = response_names[category_id + 2 * domain_id - 2])
+                         values = ifelse(test = category_id == 2, 
+                                         yes = "healthy", 
+                                         no = "infected"))
     
     # update correct response variable
     correct <- append(x = correct, values = tmp$d[[11]][i, 1:n_trials_part])

@@ -13,7 +13,9 @@ trial_trial_participant <- function (data, posteriors, participant_id,
                                      posterior_margin = 0.08, lwd_rect = 0.1,
                                      bar_width = 0.1, 
                                      transparency_bars = TRUE, 
-                                     x_lim, change_points) {
+                                     x_lim, change_points, 
+                                     add_category = FALSE, 
+                                     category_str = NA) {
   
   n_trials <- data$participant_t[participant_id]
   
@@ -90,6 +92,20 @@ trial_trial_participant <- function (data, posteriors, participant_id,
                responses[which(!is.na(responses[, tt])), tt] + 1],
            lwd = lwd_rect)
       
+      if (add_category == TRUE) {
+        if (category_str[tt] == TRUE) {
+          segments(x0 = c(tt - width / 2, tt), 
+                   y0 = c(which(!is.na(responses[, tt])), 
+                          which(!is.na(responses[, tt])) - height / 2),
+                   x1 = c(tt + width / 2, tt),
+                   y1 = c(which(!is.na(responses[, tt])), 
+                          which(!is.na(responses[, tt])) + height / 2), 
+                   lwd = 1.2, 
+                   col = ifelse(
+                     test = responses[which(!is.na(responses[, tt])), tt] == 1,
+                     yes = "white", no = "white"))
+        }
+      }
     }  
   }
   

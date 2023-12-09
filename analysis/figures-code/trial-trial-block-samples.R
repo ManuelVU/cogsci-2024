@@ -29,17 +29,18 @@ cp_2 <- unique(subset(x = tmp,
 cp_1 <- c(1, cp_1 - 1)
 cp_2 <- c(1, cp_2 - 1)
 
-participants <- which(participants_4c == 2 | participants_4c == 16)
+# participants <- which(participants_4c == 2 | participants_4c == 16)
+participants <- c(1,2)
 
 
 samples <- block_posteriors(participant_id = participants, 
                             change_points = rbind(cp_1, cp_2))
 
 # set participant id to plot
-pp <- 2
+pp <- 1
 
 # participant id in general data file
-pp_id <- 16
+pp_id <- 2
 
 # transform condition into numeric ordered variable
 condition_ordered <- sort(unique(tmp$condition_char[which(tmp$id == pp_id)]))

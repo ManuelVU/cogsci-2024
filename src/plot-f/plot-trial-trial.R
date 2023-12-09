@@ -64,7 +64,7 @@ trial_trial_participant <- function (data, posteriors, participant_id,
        xlim = x_lim, ylim = c(0,n_stimulus + height))
   
   if (!missing(change_points)) {
-    abline(v = change_points - 0.5, lty = 1)
+    abline(v = change_points + 0.5, lty = 1)
   }
   
   if (shade_stimulus == TRUE) {
